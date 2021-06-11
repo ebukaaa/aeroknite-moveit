@@ -1,0 +1,102 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true,
+    "react-native/react-native": true
+  },
+  "parser": "@babel/eslint-parser",
+  "extends": [
+    "airbnb",
+    "eslint:recommended",
+    "plugin:react/recommended",
+    // "plugin:jest/recommended",
+    // "plugin:jest/style",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:jsx-a11y/recommended",
+    "plugin:react-hooks/recommended",
+    "prettier"
+  ],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "plugins": ["react", "react-native", "prettier", "jest"],
+  "rules": {
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "never",
+        "imports": "always-multiline",
+        "objects": "always-multiline"
+      }
+    ],
+    "import/no-cycle": "off",
+    "import/no-extraneous-dependencies": "off",
+    "import/prefer-default-export": "off",
+    "import/no-unresolved": [2, { "ignore": ["tools"] }],
+    "jest/no-disabled-tests": "warn",
+    "jest/no-focused-tests": "error",
+    "jest/no-identical-title": "error",
+    "jest/prefer-to-have-length": "warn",
+    "jest/valid-expect": "error",
+    "linebreak-style": ["error", "unix"],
+    // "no-alert": "off",
+    "no-return-assign": [2, "except-parens"],
+    "no-unused-vars": "warn",
+    "prettier/prettier": "warn",
+    "quotes": ["error", "double"],
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/jsx-no-bind": [
+      "error",
+      {
+        // "ignoreDOMComponents": false
+        // "ignoreRefs":  false,
+        "allowArrowFunctions": true,
+        // "allowFunctions": true,
+        "allowBind": true
+      }
+    ],
+    "react/jsx-no-undef": "error",
+    "react/jsx-props-no-spreading": [
+      "error",
+      {
+        "exceptions": ["Path", "Logout", "Check", "Delete"]
+      }
+    ],
+    "react/react-in-jsx-scope": "off",
+    // "react/self-closing-comp": [
+    //   "error",
+    //   {
+    //     "component": true,
+    //     "html": true
+    //   }
+    // ],
+    // "react/style-prop-object": ["error",
+    //   {
+    //     "allow": ["App"]
+    //   }
+    // ],
+    "react-native/no-inline-styles": 2,
+    "react-native/no-unused-styles": "off",
+    "react-native/split-platform-components": 2,
+    // "react-native/no-color-literals": 2,
+    // "react-native/no-raw-text": [
+    //   2,
+    //   {
+    //     "skip": ["Title", "Subtitle"]
+    //   }
+    // ],
+    "semi": ["error", "always"]
+  }
+}
