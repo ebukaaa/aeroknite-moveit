@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { memo, useCallback, useLayoutEffect, useMemo, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -15,7 +15,7 @@ import inputStyles from "tools/styles/input";
 import buttonStyles from "tools/styles/button";
 import disclaimerStyles from "tools/styles/disclaimer";
 import colors from "tools/styles/colors";
-import { getCapitalised } from "tools/capitalise";
+import { getCapitalised } from "tools/capitalised";
 
 export function useStore() {
   const { params: { email: oldEmail } = {} } = useRoute();
@@ -32,8 +32,11 @@ export function useStore() {
       const { uid: id } = user;
       const currentUser = db.collection("users").doc(id);
       const doc = await currentUser.get();
+      const params = doc.data();
 
-      replace("Account", doc.data());
+      if (params) {
+        replace("Account", params);
+      }
     });
     return unsubscribe;
   }, [replace]);
@@ -110,7 +113,6 @@ export function useStore() {
       ],
       []
     ),
-    getCapitalised,
     setState,
     onChangeText: useCallback(
       (input, value) =>
@@ -157,8 +159,46 @@ export function useStore() {
       }
       return old;
     }),
+    TextInput: useMemo(() => {
+      function useTextInput({
+        style,
+        id,
+        isNew,
+        textContentType,
+        placeholderTextColor,
+        keyboardType,
+        defaultValue,
+        onChangeText,
+        onLogin,
+        onSignUp,
+      }) {
+        return (
+          <TextInput
+            style={style}
+            placeholder={getCapitalised(id)}
+            textContentType={textContentType}
+            keyboardType={!keyboardType ? "default" : keyboardType}
+            defaultValue={defaultValue}
+            secureTextEntry={id === "password"}
+            placeholderTextColor={placeholderTextColor}
+            autoCapitalize={
+              id === "email" || id === "password" ? "none" : "words"
+            }
+            onChangeText={onChangeText.bind(this, id)}
+            onSubmitEditing={!isNew ? onLogin : onSignUp}
+          />
+        );
+      }
+      return memo(
+        useTextInput,
+        (_, next) =>
+          next.id === "password" ||
+          next.id === "email" ||
+          next.id !== "password" ||
+          next.id !== "email"
+      );
+    }, []),
     Text,
-    TextInput,
     TouchableOpacity,
     ScrollView,
     SafeAreaView,

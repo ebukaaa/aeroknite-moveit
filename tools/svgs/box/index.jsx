@@ -1,12 +1,12 @@
 import { Svg, G, Path } from "./utils";
 
-export function useBoxSVG({ width, height = width, style }) {
+export function useBoxSVG({ size, style }) {
   return (
     <Svg
-      height={height}
+      height={(784 / 750) * size}
       style={style}
       viewBox="0 0 750 784"
-      width={width}
+      width={size}
       xmlns="http://www.w3.org/2000/svg"
     >
       <G fill="#b55415" filter="url(#prefix__a)" transform="translate(9 9)">

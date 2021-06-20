@@ -8,11 +8,11 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { getCapitalised } from "tools/capitalise";
+import { getCapitalised } from "tools/capitalised";
 import { auth, db } from "tools/firebase";
 import inputStyles from "tools/styles/input";
+import colors from "tools/styles/colors";
 import { AntDesign } from "@expo/vector-icons";
-import { string } from "prop-types";
 
 export function useStore() {
   const {
@@ -22,8 +22,12 @@ export function useStore() {
   const [, setState] = useState(null);
 
   useLayoutEffect(() => {
-    const Check = memo(
-      ({ tintColor }) =>
+    const Check = memo(() => {
+      const {
+        text: { accent },
+      } = colors;
+
+      return (
         title === "profile" && (
           <TouchableOpacity
             onPress={setState.bind(null, (old) => {
@@ -54,20 +58,18 @@ export function useStore() {
               return old;
             })}
           >
-            <AntDesign name="check" size={20} color={tintColor} />
+            <AntDesign name="check" size={20} color={accent()} />
           </TouchableOpacity>
         )
-    );
+      );
+    });
 
     Check.displayName = "Check";
-    Check.propTypes = {
-      tintColor: string.isRequired,
-    };
 
     setOptions({
       headerTitle: getCapitalised(title),
-      headerRight(props) {
-        return <Check {...props} />;
+      headerRight() {
+        return <Check />;
       },
     });
   }, [title, setOptions, navigate]);
@@ -131,7 +133,6 @@ export function useStore() {
       ],
       [info]
     ),
-    getCapitalised,
     onChangeText: useCallback(
       (id, text) =>
         setState((old) => ({
@@ -141,7 +142,34 @@ export function useStore() {
       []
     ),
     SafeAreaView,
-    TextInput,
+    TextInput: useMemo(() => {
+      function useTextInput({
+        style,
+        defaultValue,
+        id,
+        textContentType,
+        placeholderTextColor,
+        keyboardType,
+        onChangeText,
+      }) {
+        return (
+          <TextInput
+            style={style}
+            defaultValue={defaultValue}
+            placeholder={getCapitalised(id)}
+            textContentType={textContentType}
+            placeholderTextColor={placeholderTextColor}
+            secureTextEntry={id === "password"}
+            autoCapitalize={
+              id === "password" || id === "email" ? "none" : "words"
+            }
+            keyboardType={!keyboardType ? "default" : keyboardType}
+            onChangeText={onChangeText.bind(this, id)}
+          />
+        );
+      }
+      return memo(useTextInput);
+    }, []),
     FlatList,
     KeyboardAvoidingView,
   };

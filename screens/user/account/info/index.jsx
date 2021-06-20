@@ -11,7 +11,6 @@ export function useInfo() {
     },
     title,
     info,
-    getCapitalised,
     onChangeText,
     TextInput,
     SafeAreaView,
@@ -29,23 +28,17 @@ export function useInfo() {
             data={info}
             renderItem={({
               item: { id, data, textContentType, keyboardType },
-            }) =>
-              (data || id === "password") && (
-                <TextInput
-                  style={inputStyles}
-                  defaultValue={data}
-                  placeholder={getCapitalised(id)}
-                  textContentType={textContentType}
-                  placeholderTextColor={placeholderColor}
-                  secureTextEntry={id === "password"}
-                  autoCapitalize={
-                    id === "password" || id === "email" ? "none" : "words"
-                  }
-                  keyboardType={!keyboardType ? "default" : keyboardType}
-                  onChangeText={onChangeText.bind(this, id)}
-                />
-              )
-            }
+            }) => (
+              <TextInput
+                id={id}
+                style={inputStyles}
+                defaultValue={data}
+                textContentType={textContentType}
+                placeholderTextColor={placeholderColor}
+                keyboardType={keyboardType}
+                onChangeText={onChangeText}
+              />
+            )}
           />
         </KeyboardAvoidingView>
       )}

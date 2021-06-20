@@ -1,11 +1,11 @@
 import { Svg, G, Path } from "./utils";
 
-export function useHomeSVG({ width, height = width, fill, style }) {
+export function useHomeSVG({ size, fill, style }) {
   return (
     <Svg
-      height={height}
+      height={size}
       viewBox="0 0 217 217"
-      width={width}
+      width={size}
       style={style}
       xmlns="http://www.w3.org/2000/svg"
     >

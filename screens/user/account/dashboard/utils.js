@@ -8,24 +8,23 @@ import {
   View,
   SafeAreaView,
 } from "react-native";
+import { useSuitcaseSVG, useTruckSVG } from "tools";
 import card from "tools/styles/card";
-import { getCapitalised } from "tools/capitalise";
 import colors from "tools/styles/colors";
+import iconStyles from "tools/styles/icon";
+import { getCapitalised } from "tools/capitalised";
 import { auth } from "tools/firebase";
 import { getDimensions } from "tools/dimensions";
-import {
-  AntDesign,
-  MaterialCommunityIcons,
-  MaterialIcons,
-} from "@expo/vector-icons";
-import { string } from "prop-types";
+import { AntDesign } from "@expo/vector-icons";
 
 export function useStore() {
   const { setOptions, navigate, replace } = useNavigation();
   const { params } = useRoute();
 
   useLayoutEffect(() => {
-    const Logout = memo(({ tintColor }) => (
+    const tintColor = colors.text.accent();
+
+    const Logout = memo(() => (
       <TouchableOpacity
         onPress={() =>
           auth()
@@ -37,33 +36,33 @@ export function useStore() {
       </TouchableOpacity>
     ));
     Logout.displayName = "Logout";
-    Logout.propTypes = {
-      tintColor: string.isRequired,
-    };
 
-    const Delete = memo(({ tintColor }) => (
-      <TouchableOpacity onPress={() => {}}>
+    const Delete = memo(() => (
+      <TouchableOpacity
+        onPress={() =>
+          navigate("Modal", {
+            oldEmail: params.email,
+          })
+        }
+      >
         <AntDesign name="deleteuser" color={tintColor} size={20} />
       </TouchableOpacity>
     ));
     Delete.displayName = "Delete";
-    Delete.propTypes = {
-      tintColor: string.isRequired,
-    };
 
     setOptions({
-      headerLeft(props) {
-        return <Logout {...props} />;
+      headerLeft() {
+        return <Logout />;
       },
-      headerRight(props) {
-        return <Delete {...props} />;
+      headerRight() {
+        return <Delete />;
       },
     });
-  }, [setOptions, replace, params.email]);
+  }, [params.email, replace, setOptions, navigate]);
 
   return {
     styles: useMemo(() => {
-      const { create } = StyleSheet;
+      const { create, compose } = StyleSheet;
       const { containerStyles, titleStyles } = card;
       const {
         text: { normal, secondary },
@@ -89,11 +88,16 @@ export function useStore() {
           }),
           iconStyles: {
             iconColor: normalIcon(0.4),
-            ...create({
-              containerStyles: {
-                alignSelf: "center",
-              },
-            }),
+            containerStyles: compose(
+              iconStyles({}).containerStyles,
+              create({
+                extra: {
+                  alignSelf: "center",
+                  marginBottom: 20,
+                  marginTop: 10,
+                },
+              }).extra
+            ),
           },
           infoStyles: create({
             containerStyles: {
@@ -142,14 +146,14 @@ export function useStore() {
         {
           id: "stored",
           alert: "No item stored!",
-          icon: "luggage",
-          SVG: MaterialIcons,
+          size: 26,
+          SVG: useSuitcaseSVG,
         },
         {
           id: "collected",
           alert: "No item collected!",
-          icon: "truck-delivery",
-          SVG: MaterialCommunityIcons,
+          size: 40,
+          SVG: useTruckSVG,
         },
       ],
       [params]

@@ -4,139 +4,72 @@ export function useDetail() {
   const {
     styles: {
       appStyles,
+      disclaimerStyles: { labelStyles: disclaimerStyles },
       quotesStyles: { containerStyles: quotesStyles, labelStyles },
+      headerStyles: {
+        containerStyles: headerStyles,
+        titleStyles: headerTitleStyles,
+        subHeaderStyles: {
+          containerStyles: subHeaderStyles,
+          titleStyles: subHeaderTitleStyles,
+        },
+      },
+      dimensionStyles: {
+        containerStyles: dimensionStyles,
+        labelStyles: dimensionLabelStyles,
+      },
     },
+    dimensions,
     price,
     onQuotes,
     View,
     Text,
     SafeAreaView,
     TouchableOpacity,
+    Fragment,
   } = useStore();
 
   return (
     <SafeAreaView style={appStyles}>
       <View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "bold",
-              color: "rgb(212,163,86)",
-            }}
-          >
-            Dimension
-          </Text>
+        <View style={headerStyles}>
+          <Text style={headerTitleStyles}>Dimension</Text>
 
-          <View
-            style={{
-              backgroundColor: "#A2690C",
-              borderRadius: 7,
-              width: 60,
-              alignItems: "center",
-              justifyContent: "center",
-              height: 16,
-            }}
-          >
-            <Text
-              style={{ fontSize: 12, fontWeight: "bold", color: "#621A17" }}
-            >
-              in cm
-            </Text>
+          <View style={subHeaderStyles}>
+            <Text style={subHeaderTitleStyles}>in cm</Text>
           </View>
         </View>
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingHorizontal: 10,
-            paddingTop: 10,
-          }}
-        >
-          <Text style={{ color: "#937171" }}>W</Text>
-          <Text style={{ color: "#937171" }}>•</Text>
-          <Text style={{ color: "#937171" }}>12</Text>
-          <Text style={{ color: "#937171" }}>•</Text>
-          <Text style={{ color: "#937171" }}>H</Text>
-          <Text style={{ color: "#937171" }}>•</Text>
-          <Text style={{ color: "#937171" }}>13</Text>
-          <Text style={{ color: "#937171" }}>•</Text>
-          <Text style={{ color: "#937171" }}>L</Text>
-          <Text style={{ color: "#937171" }}>•</Text>
-          <Text style={{ color: "#937171" }}>15</Text>
+        <View style={dimensionStyles}>
+          {dimensions.map((dimension, index) => (
+            <Fragment key={dimension}>
+              <Text style={dimensionLabelStyles}>{dimension}</Text>
+
+              {index !== dimensions.length - 1 && (
+                <Text style={dimensionLabelStyles}>•</Text>
+              )}
+            </Fragment>
+          ))}
         </View>
       </View>
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Text
-          style={{ fontSize: 20, fontWeight: "bold", color: "rgb(212,163,86)" }}
-        >
-          Weight
-        </Text>
+      <View style={headerStyles}>
+        <Text style={headerTitleStyles}>Weight</Text>
 
-        <View
-          style={{
-            backgroundColor: "#A2690C",
-            borderRadius: 7,
-            width: 60,
-            alignItems: "center",
-            justifyContent: "center",
-            height: 16,
-          }}
-        >
-          <Text style={{ fontSize: 12, fontWeight: "bold", color: "#621A17" }}>
-            20 g
-          </Text>
+        <View style={subHeaderStyles}>
+          <Text style={subHeaderTitleStyles}>20 g</Text>
         </View>
       </View>
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Text
-          style={{ fontSize: 20, fontWeight: "bold", color: "rgb(212,163,86)" }}
-        >
-          Price
-        </Text>
+      <View style={headerStyles}>
+        <Text style={headerTitleStyles}>Price</Text>
 
-        <View
-          style={{
-            backgroundColor: "#A2690C",
-            borderRadius: 7,
-            width: 60,
-            alignItems: "center",
-            justifyContent: "center",
-            height: 16,
-          }}
-        >
-          <Text style={{ fontSize: 12, fontWeight: "bold", color: "#621A17" }}>
-            £ {price}
-          </Text>
+        <View style={subHeaderStyles}>
+          <Text style={subHeaderTitleStyles}>£ {price}</Text>
         </View>
       </View>
 
-      <Text
-        style={{ fontSize: 12, color: "rgb(212,163,86)", alignSelf: "center" }}
-      >
-        *Price is subject to changes
-      </Text>
+      <Text style={disclaimerStyles}>*Price is subject to changes</Text>
 
       <TouchableOpacity
         activeOpacity={0.5}

@@ -10,9 +10,10 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import card from "tools/styles/card";
 import buttonStyles from "tools/styles/button";
+import iconStyles from "tools/styles/icon";
 import colors from "tools/styles/colors";
 import { getDimensions } from "tools/dimensions";
-import { getCapitalised } from "tools/capitalise";
+import { getCapitalised } from "tools/capitalised";
 import { useBoxSVG, useSuitcaseSVG } from "tools";
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -40,7 +41,7 @@ export function useStore() {
 
   return {
     styles: useMemo(() => {
-      const { create } = StyleSheet;
+      const { create, compose } = StyleSheet;
       const { containerStyles, titleStyles } = card;
       const {
         text: { normal: normalText },
@@ -68,20 +69,19 @@ export function useStore() {
                 containerStyles: {
                   alignItems: "center",
                 },
-                iconStyles: {
-                  marginBottom: 10,
-                  shadowOpacity: 0.2,
-                  shadowRadius: 0.1,
-                  shadowOffset: {
-                    width: -2,
-                    height: 2,
-                  },
-                },
                 dimensionStyles: {
                   margin: 10,
                   color: normalText(),
                 },
               }),
+              iconStyles: compose(
+                iconStyles({}).containerStyles,
+                create({
+                  extra: {
+                    marginBottom: 10,
+                  },
+                }).extra
+              ),
               priceStyles: buttonStyles(),
             },
           },
@@ -92,7 +92,6 @@ export function useStore() {
       () => [
         {
           id: "Boxes",
-          ratio: 784 / 750,
           SVG: useBoxSVG,
           prices: [
             {
@@ -114,7 +113,6 @@ export function useStore() {
         },
         {
           id: "Suitcases",
-          ratio: 917 / 620,
           SVG: useSuitcaseSVG,
           prices: [
             {
