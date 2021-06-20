@@ -38,7 +38,7 @@ export function useDashboard() {
         contentOffset={{ y: -1 }}
         contentContainerStyle={dashboardStyles}
         data={items}
-        renderItem={({ item: { id, prices, SVG, ratio } }) => (
+        renderItem={({ item: { id, prices, SVG } }) => (
           <View style={sectionStyles}>
             <Text style={titleStyles}>{id}</Text>
 
@@ -53,11 +53,7 @@ export function useDashboard() {
                     price,
                   })}
                 >
-                  <SVG
-                    width={getWidth(size)}
-                    height={getWidth(size) * ratio}
-                    style={iconStyles}
-                  />
+                  <SVG size={getWidth(size)} style={iconStyles} />
                   <Text style={dimensionStyles}>{dimension}</Text>
 
                   <View style={priceStyles}>

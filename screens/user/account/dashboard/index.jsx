@@ -29,7 +29,7 @@ export function useDashboard() {
         contentOffset={{ y: -1 }}
         contentContainerStyle={contentStyles}
         data={sections}
-        renderItem={({ item: { id, SVG, icon, alert, info } }) => (
+        renderItem={({ item: { id, SVG, alert, info, size } }) => (
           <TouchableOpacity
             key={id}
             style={containerStyles}
@@ -55,12 +55,7 @@ export function useDashboard() {
                 </View>
               ))}
             {SVG && (
-              <SVG
-                name={icon}
-                size={getWidth(40)}
-                color={iconColor}
-                style={iconStyles}
-              />
+              <SVG fill={iconColor} size={getWidth(size)} style={iconStyles} />
             )}
             {alert && <Text style={textStyles}>{alert}</Text>}
           </TouchableOpacity>

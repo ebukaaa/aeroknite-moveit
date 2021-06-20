@@ -11,7 +11,6 @@ export function useAuth() {
     },
     inputs,
     state: { isNew, user } = {},
-    getCapitalised,
     setState,
     onChangeText,
     onLogin,
@@ -32,21 +31,19 @@ export function useAuth() {
             ({ id, textContentType, keyboardType }) =>
               (id === "password" ||
                 id === "email" ||
-                (isNew && (id !== "password" || id === "email"))) && (
+                (isNew && (id !== "password" || id !== "email"))) && (
                 <TextInput
                   key={id}
+                  isNew={isNew}
                   style={inputStyles}
-                  placeholder={getCapitalised(id)}
                   textContentType={textContentType}
-                  keyboardType={!keyboardType ? "default" : keyboardType}
-                  value={user?.[id]}
-                  secureTextEntry={id === "password"}
+                  keyboardType={keyboardType}
+                  defaultValue={user?.[id]}
+                  id={id}
                   placeholderTextColor={placeholderColor}
-                  autoCapitalize={
-                    id === "email" || id === "password" ? "none" : "words"
-                  }
-                  onChangeText={onChangeText.bind(this, id)}
-                  onSubmitEditing={!isNew ? onLogin : onSignUp}
+                  onChangeText={onChangeText}
+                  onLogin={onLogin}
+                  onSignUp={onSignUp}
                 />
               )
           )}

@@ -13,6 +13,9 @@ export default {
     secondary(opacity) {
       return getColor(opacity, "197,92,54");
     },
+    primary(opacity) {
+      return getColor(opacity, "162,105,12");
+    },
   },
   text: {
     accent(opacity) {

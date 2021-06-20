@@ -1,79 +1,91 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { memo } from "react";
-import { useUserSVG as UserSVG, useHomeSVG as HomeSVG } from "tools";
+import { memo, useMemo } from "react";
+import {
+  useUserSVG as UserSVG,
+  useHomeSVG as HomeSVG,
+  useIconSVG as IconSVG,
+} from "tools";
 import colors from "tools/styles/colors";
+import { getDimensions } from "tools/dimensions";
+import iconStyles from "tools/styles/icon";
 import { string, bool } from "prop-types";
+import { useHome } from "./home/index.routes";
+import { useUser } from "./user/index.routes";
+import { useMap } from "./map/index.routes";
 
-const {
-  background: { accent: accentBackground },
-  text: { accent: accentText },
-} = colors;
-
-export const { Navigator, Screen } = createBottomTabNavigator();
-export const tabBarOptions = {
-  style: {
-    position: "absolute",
-    bottom: 5,
-    height: 54,
-    borderRadius: 48,
-    borderTopWidth: 0,
-    marginHorizontal: 8,
-    shadowColor: "black",
-    shadowOffset: {
-      width: 0,
-      height: -1,
-    },
-    shadowRadius: 3,
-    shadowOpacity: 0.2,
-    backgroundColor: accentBackground(),
-  },
-  showLabel: false,
-};
-
-const Icon = memo(({ tabName, isTab }) => {
-  const size = 20;
-  let icon;
-  const style = {
-    shadowOpacity: 0.2,
-    shadowRadius: 0.1,
-    shadowOffset: {
-      width: -2,
-      height: 2,
-    },
-  };
-
-  if (tabName === "User") {
-    icon = (
-      <UserSVG
-        width={size}
-        height={(240 / 217) * size}
-        fill={isTab && accentText()}
-        style={style}
-      />
-    );
-  }
-  if (tabName === "Home") {
-    icon = <HomeSVG width={size} fill={isTab && accentText()} style={style} />;
-  }
-
-  return icon;
-});
-
-Icon.displayName = "Icon";
-Icon.propTypes = {
-  tabName: string.isRequired,
-  isTab: bool.isRequired,
-};
-
-export const screenOptions = ({ route: { name } }) => {
-  function tabBarIcon({ focused }) {
-    return <Icon tabName={name} isTab={focused} />;
-  }
-
+export function useStore() {
   return {
-    tabBarIcon,
-  };
-};
+    tab: useMemo(() => createBottomTabNavigator(), []),
+    options: useMemo(() => {
+      const {
+        background: { accent: accentBackground },
+        text: { accent: accentText },
+      } = colors;
+      const Icon = memo(({ tabName, isTab }) => {
+        const size = 20;
+        let icon;
+        const { containerStyles: style } = iconStyles({});
+        const { containerStyles: mapStyles } = iconStyles({
+          shadowRadius: 5,
+          shadowOffset: {
+            height: 0,
+            width: 0,
+          },
+        });
+        const fill = accentText();
 
-export { useHome } from "./home/index.routes";
-export { useUser } from "./user/index.routes";
+        if (tabName === "User") {
+          icon = <UserSVG size={size} fill={isTab && fill} style={style} />;
+        }
+        if (tabName === "Home") {
+          icon = <HomeSVG size={size} fill={isTab && fill} style={style} />;
+        }
+        if (tabName === "Map") {
+          icon = <IconSVG size={55} style={mapStyles} />;
+        }
+
+        return icon;
+      });
+
+      Icon.displayName = "Icon";
+      Icon.propTypes = {
+        tabName: string.isRequired,
+        isTab: bool.isRequired,
+      };
+
+      return {
+        screenOptions({ route: { name } }) {
+          function tabBarIcon({ focused }) {
+            return <Icon tabName={name} isTab={focused} />;
+          }
+
+          return {
+            tabBarIcon,
+          };
+        },
+        tabBarOptions: {
+          style: {
+            position: "absolute",
+            bottom: 10,
+            height: 45,
+            borderRadius: 48,
+            borderTopWidth: 0,
+            marginHorizontal: getDimensions(12).width,
+            shadowColor: "black",
+            shadowOffset: {
+              width: 0,
+              height: -1,
+            },
+            shadowRadius: 3,
+            shadowOpacity: 0.2,
+            backgroundColor: accentBackground(),
+          },
+          showLabel: false,
+        },
+      };
+    }, []),
+    useHome,
+    useUser,
+    useMap,
+  };
+}

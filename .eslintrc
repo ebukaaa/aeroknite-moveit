@@ -41,6 +41,7 @@
         "objects": "always-multiline"
       }
     ],
+    "global-require":"off",
     "import/no-cycle": "off",
     "import/no-extraneous-dependencies": "off",
     "import/prefer-default-export": "off",
