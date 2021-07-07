@@ -72,7 +72,7 @@
     "react/jsx-props-no-spreading": [
       "error",
       {
-        "exceptions": ["Path", "Logout", "Check", "Delete"]
+        "exceptions": ["Path", "Logout", "Check", "Delete", "Sheet", "Storage"]
       }
     ],
     "react/react-in-jsx-scope": "off",

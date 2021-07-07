@@ -1,162 +1,125 @@
-import { useMemo } from "react";
-import { StyleSheet, Image, View, useWindowDimensions } from "react-native";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { StyleSheet, Image, View, Keyboard } from "react-native";
 import { createNativeStackNavigator } from "react-native-screens/native-stack";
 import MapView, { Marker } from "react-native-maps";
 import { getDimensions } from "tools/dimensions";
+import colors from "tools/styles/colors";
+import { screenOptions as defaultOptions } from "tools/options";
 import Animated, {
   useSharedValue,
   useAnimatedGestureHandler,
   useAnimatedStyle,
   withSpring,
+  runOnJS,
 } from "react-native-reanimated";
 import { PanGestureHandler } from "react-native-gesture-handler";
-import { snapPoint } from "react-native-redash";
-import { useSheet } from "./sheet";
+import { useSheet as Sheet } from "./sheet";
+import { useStorage as Storage } from "./storage";
+
+let putOpacity;
+
+function useStates({ children }) {
+  const [, setOpacity] = useState(null);
+
+  useMemo(() => (putOpacity = setOpacity), []);
+
+  return <>{children}</>;
+}
 
 export function useStore() {
   const { create } = useMemo(() => StyleSheet, []);
-  const { height: desiredHeight } = useMemo(() => getDimensions(null, 70), []);
-  const top = useSharedValue(desiredHeight);
-  const springConfig = useMemo(
+  const {
+    background: { accent: backgroundAccent },
+  } = useMemo(() => colors, []);
+  const desiredHeight = useMemo(() => 150, []);
+  const height = useSharedValue(desiredHeight);
+  const snapPoints = useMemo(
     () => ({
-      damping: 15,
-      mass: 1,
-      stiffness: 150,
-      overshoot: false,
-      restSpeedThreshold: 0.1,
-      restDisplacementThreshold: 0.1,
+      top: {
+        value: getDimensions(null, 90).height,
+      },
+      middle: {
+        range: [getDimensions(null, 40).height, getDimensions(null, 60).height],
+        value: getDimensions(null, 50).height,
+      },
     }),
     []
   );
-  const animatedStyle = useAnimatedStyle(() => ({
-    top: withSpring(top.value, springConfig),
-  }));
-  const { height: deviceHeight } = useWindowDimensions();
-  const snapPointsY = useMemo(
-    () => [
-      desiredHeight - 10,
-      getDimensions(null, 50).height - 10,
-      getDimensions(null, 20).height,
-    ],
-    [desiredHeight]
+  const setOpacity = useCallback(
+    (value) =>
+      putOpacity((old) => {
+        const opacity = old;
+        opacity.value = value;
+        return opacity;
+      }),
+    []
+  );
+  const mapProps = useCallback(
+    () => ({
+      putOpacity,
+    }),
+    []
   );
 
-  useMemo(
-    () => (top.value = withSpring(desiredHeight, springConfig)),
-    [top, desiredHeight, springConfig]
-  );
+  useLayoutEffect(() => {
+    const keyboardWillShow = Keyboard.addListener("keyboardWillShow", () => {
+      const {
+        middle: { value },
+      } = snapPoints;
+      height.value = value + 10;
+    });
+
+    return () => Keyboard.removeSubscription(keyboardWillShow);
+  }, [height, snapPoints]);
 
   return {
-    styles: useMemo(
-      () => ({
-        ...create({
-          appStyles: { flex: 1 },
-          imageStyles: {
-            height: 32,
-            width: 32,
-          },
-        }),
-        sheetStyles: {
-          animatedStyle,
+    styles: {
+      sheetStyles: {
+        animatedStyle: useAnimatedStyle(() => ({
+          height: withSpring(height.value, {
+            damping: 30,
+            stiffness: 250,
+            overshootClamping: true,
+            restSpeedThreshold: 0.1,
+            restDisplacementThreshold: 0.1,
+          }),
+        })),
+        ...useMemo(
+          () =>
+            create({
+              containerStyles: {
+                backgroundColor: backgroundAccent(),
+                position: "absolute",
+                bottom: 0,
+                width: "100%",
+                height: "100%",
+                borderTopLeftRadius: 14,
+                borderTopRightRadius: 14,
+                paddingTop: 14,
+              },
+              barStyles: {
+                backgroundColor: "#743A38",
+                borderRadius: 100,
+                height: 5,
+                marginHorizontal: "40%",
+              },
+            }),
+          [backgroundAccent, create]
+        ),
+      },
+      ...useMemo(
+        () => ({
           ...create({
-            containerStyles: {
-              backgroundColor: "#621A17",
-              position: "absolute",
-              width: "100%",
-              bottom: 0,
-              borderTopLeftRadius: 14,
-              borderTopRightRadius: 14,
-              paddingTop: 14,
-            },
-            barStyles: {
-              backgroundColor: "#743A38",
-              borderRadius: 100,
-              height: 5,
-              marginHorizontal: "40%",
+            appStyles: { flex: 1 },
+            imageStyles: {
+              height: 32,
+              width: 32,
             },
           }),
-        },
-      }),
-      [animatedStyle, create]
-    ),
-    stack: useMemo(() => createNativeStackNavigator(), []),
-    screenOptions: useMemo(
-      () => ({
-        ...create({
-          contentStyle: {
-            backgroundColor: "transparent",
-          },
         }),
-        headerShown: false,
-      }),
-      [create]
-    ),
-    storages: useMemo(
-      () => [
-        {
-          name: "The Big Yellow Storage Company",
-          location: [
-            {
-              country: "UK",
-              places: [
-                {
-                  city: "Manchester",
-                  postcode: "M3 4JH",
-                  street: "1 New Elm Road",
-                  phone: "0161 989 4346",
-                  coordinates: {
-                    latitude: 53.47665474747415,
-                    longitude: -2.2593206731287445,
-                  },
-                },
-                {
-                  city: "Stockport",
-                  postcode: "SK1 2AD",
-                  street: "Bailey Road Portwood",
-                  phone: "0161 476 9210",
-                  coordinates: {
-                    latitude: 53.41861893202355,
-                    longitude: -2.146080473130963,
-                  },
-                },
-              ],
-            },
-          ],
-        },
-        {
-          name: "Safe Store",
-          location: [
-            {
-              country: "UK",
-              places: [
-                {
-                  city: "Sheffield",
-                  postcode: "S3 8RW",
-                  street: "1 Russell Street Kelham Island",
-                  phone: "0114 553 5373",
-                  coordinates: {
-                    latitude: 53.38761157197384,
-                    longitude: -1.4713035866252064,
-                  },
-                },
-                {
-                  city: "Liverpool",
-                  postcode: "L1 0BG",
-                  street: "Queens Dock Jordan Street",
-                  phone: "0151 709 6622",
-                  coordinates: {
-                    latitude: 53.39639286690259,
-                    longitude: -2.9806130937391333,
-                  },
-                },
-              ],
-            },
-          ],
-        },
-      ],
-      []
-    ),
-    pinMarker: useMemo(() => require("assets/pin.png"), []),
+        [create]
+      ),
+    },
     customMapStyle: useMemo(
       () => [
         {
@@ -396,24 +359,154 @@ export function useStore() {
       ],
       []
     ),
+    stack: useMemo(() => createNativeStackNavigator(), []),
+    screenOptions: useCallback(
+      ({ route: { name } }) => {
+        let options = {
+          ...create({
+            contentStyle: {
+              backgroundColor: backgroundAccent(),
+              paddingHorizontal: "8%",
+            },
+          }),
+        };
+
+        if (name === "Sheet") {
+          options = {
+            ...defaultOptions,
+            ...options,
+          };
+        } else if (name === "Storage") {
+          options = {
+            ...defaultOptions,
+            ...options,
+            headerBackTitleVisible: false,
+            headerLargeTitle: true,
+          };
+        }
+
+        return options;
+      },
+      [backgroundAccent, create]
+    ),
+    storages: useMemo(
+      () => [
+        {
+          name: "The Big Yellow Storage Company",
+          location: [
+            {
+              country: "UK",
+              places: [
+                {
+                  city: "Manchester",
+                  postcode: "M3 4JH",
+                  street: "1 New Elm Road",
+                  phone: "0161 989 4346",
+                  coordinates: {
+                    latitude: 53.47665474747415,
+                    longitude: -2.2593206731287445,
+                  },
+                },
+                {
+                  city: "Stockport",
+                  postcode: "SK1 2AD",
+                  street: "Bailey Road Portwood",
+                  phone: "0161 476 9210",
+                  coordinates: {
+                    latitude: 53.41861893202355,
+                    longitude: -2.146080473130963,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: "Safe Store",
+          location: [
+            {
+              country: "UK",
+              places: [
+                {
+                  city: "Sheffield",
+                  postcode: "S3 8RW",
+                  street: "1 Russell Street Kelham Island",
+                  phone: "0114 553 5373",
+                  coordinates: {
+                    latitude: 53.38761157197384,
+                    longitude: -1.4713035866252064,
+                  },
+                },
+                {
+                  city: "Liverpool",
+                  postcode: "L1 0BG",
+                  street: "Queens Dock Jordan Street",
+                  phone: "0151 709 6622",
+                  coordinates: {
+                    latitude: 53.39639286690259,
+                    longitude: -2.9806130937391333,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      []
+    ),
+    pinMarker: useMemo(() => require("assets/pin.png"), []),
+    onDismiss: useCallback(() => {
+      Keyboard.dismiss();
+      height.value = desiredHeight;
+    }, [height, desiredHeight]),
     onGestureEvent: useAnimatedGestureHandler({
       onStart(_, context) {
-        context.y = top.value;
+        context.height = height.value;
       },
       onActive({ translationY }, context) {
-        top.value = context.y + translationY;
+        height.value = context.height - translationY;
+
+        const {
+          middle: { range: middleRange },
+        } = snapPoints;
+        const m1 = middleRange[0];
+        const m2 = middleRange[1];
+
+        if (height.value > m2) {
+          runOnJS(setOpacity)(1);
+        } else if (height.value >= m1 && height.value < m2) {
+          runOnJS(setOpacity)(1);
+        } else {
+          runOnJS(setOpacity)(0);
+          runOnJS(Keyboard.dismiss)();
+        }
       },
-      onEnd({ y, velocityY }) {
-        const snapPointY = snapPoint(y, velocityY, snapPointsY);
-        // if (
-        //   y >= getDimensions(null, 40).height &&
-        //   y < getDimensions(null, 60).height
-        // ) {
-        // }
-        top.value = withSpring(snapPointY, springConfig);
+      onEnd() {
+        const {
+          top: { value: topValue },
+          middle: { range: middleRange, value: middleValue },
+        } = snapPoints;
+        const m1 = middleRange[0];
+        const m2 = middleRange[1];
+
+        if (height.value > m2) {
+          height.value = topValue;
+        } else if (height.value >= m1 && height.value < m2) {
+          height.value = middleValue;
+        } else {
+          height.value = desiredHeight;
+        }
       },
     }),
-    useSheet,
+    useSheet: useCallback(
+      (props) => <Sheet {...props} mapProps={mapProps} />,
+      [mapProps]
+    ),
+    useStorage: useCallback(
+      (props) => <Storage {...props} mapProps={mapProps} height={height} />,
+      [mapProps, height]
+    ),
+    States: useStates,
     Animated,
     View,
     Image,

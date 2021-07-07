@@ -16,6 +16,9 @@ export default {
     primary(opacity) {
       return getColor(opacity, "162,105,12");
     },
+    other(opacity) {
+      return getColor(opacity, "147,113,113");
+    },
   },
   text: {
     accent(opacity) {
