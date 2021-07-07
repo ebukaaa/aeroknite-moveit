@@ -12,8 +12,11 @@ export function useMap() {
     stack: { Navigator, Screen },
     storages,
     pinMarker,
+    onDismiss,
     onGestureEvent,
     useSheet,
+    useStorage,
+    States,
     Animated,
     Image,
     View,
@@ -23,13 +26,13 @@ export function useMap() {
   } = useStore();
 
   return (
-    <>
+    <States>
       <MapView
         style={appStyles}
         customMapStyle={customMapStyle}
         provider="google"
         loadingEnabled
-        region={{
+        initialRegion={{
           latitude: 52.3555,
           longitude: -1.3,
           latitudeDelta: 6,
@@ -37,6 +40,7 @@ export function useMap() {
         }}
         loadingBackgroundColor="#585858"
         loadingIndicatorColor="#585858"
+        onPress={onDismiss}
       >
         {storages.map(({ name, location }) =>
           location[0].places.map(({ postcode, coordinates, street }) => (
@@ -58,9 +62,10 @@ export function useMap() {
 
           <Navigator screenOptions={screenOptions}>
             <Screen name="Sheet" component={useSheet} />
+            <Screen name="Storage" component={useStorage} />
           </Navigator>
         </Animated.View>
       </PanGestureHandler>
-    </>
+    </States>
   );
 }

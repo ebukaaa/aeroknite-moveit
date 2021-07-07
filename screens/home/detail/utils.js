@@ -9,7 +9,7 @@ import {
 import { getDimensions } from "tools/dimensions";
 import buttonStyles from "tools/styles/button";
 import disclaimerStyles from "tools/styles/disclaimer";
-import colors from "tools/styles/colors";
+import colors, { getColor } from "tools/styles/colors";
 import { useRoute, useNavigation } from "@react-navigation/native";
 
 export function useStore() {
@@ -31,7 +31,7 @@ export function useStore() {
       const { create } = StyleSheet;
       const {
         text: { secondary },
-        background: { accent, primary },
+        background: { accent, primary, other: otherBackground },
       } = colors;
 
       return {
@@ -84,7 +84,12 @@ export function useStore() {
             paddingTop: 10,
           },
           labelStyles: {
-            color: "#937171",
+            color: otherBackground(),
+            textShadowOffset: {
+              height: 2,
+            },
+            textShadowColor: getColor(0.3),
+            textShadowRadius: 0.6,
           },
         }),
       };
