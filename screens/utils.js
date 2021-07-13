@@ -99,7 +99,6 @@ export function useStore() {
             borderRadius: 48,
             borderTopWidth: 0,
             marginHorizontal: getDimensions(12).width,
-            shadowColor: "black",
             shadowOffset: {
               width: 0,
               height: -1,
