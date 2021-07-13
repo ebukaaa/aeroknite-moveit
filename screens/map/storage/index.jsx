@@ -1,27 +1,25 @@
 import { useStore } from "./utils";
 
-export function useStorage({ mapProps, height }) {
+export function useStorage({ mapProps }) {
   const {
     styles: {
-      animatedStyles,
-      scrollStyles: {
-        contentStyles: scrollStyles,
-        buttonsStyles: {
-          containerStyles: buttonsStyles,
-          collectStyles: {
-            containerStyles: collectStyles,
-            labelStyles: collectLabelStyles,
-          },
-          storeStyles: {
-            containerStyles: storeStyles,
-            labelStyles: storeLabelStyles,
-          },
+      animatedOpacity,
+      contentStyles: scrollStyles,
+      buttonsStyles: {
+        containerStyles: buttonsStyles,
+        collectStyles: {
+          containerStyles: collectStyles,
+          labelStyles: collectLabelStyles,
         },
-        fieldStyles: {
-          containerStyles: fieldStyles,
-          detailStyles,
-          labelStyles: { containerStyles: labelStyles, titleStyles },
+        storeStyles: {
+          containerStyles: storeStyles,
+          labelStyles: storeLabelStyles,
         },
+      },
+      fieldStyles: {
+        containerStyles: fieldStyles,
+        detailStyles,
+        labelStyles: { containerStyles: labelStyles, titleStyles },
       },
     },
     fields,
@@ -31,13 +29,13 @@ export function useStorage({ mapProps, height }) {
     Animated,
     SafeAreaView,
     TouchableOpacity,
-  } = useStore({ mapProps, height });
+  } = useStore({ mapProps });
 
   return (
     <SafeAreaView>
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
-        style={animatedStyles}
+        style={animatedOpacity}
         contentContainerStyle={scrollStyles}
       >
         {fields.map(({ label, detail }) => (
@@ -65,3 +63,4 @@ export function useStorage({ mapProps, height }) {
     </SafeAreaView>
   );
 }
+export { useProps } from "./utils";
