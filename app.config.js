@@ -4,7 +4,7 @@ export default {
   name: "moveit",
   description: "Aeroknite Moveit App",
   slug: "moveit",
-  version: "2.3.0",
+  version: "2.4.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
   splash: {

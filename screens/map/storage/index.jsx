@@ -1,6 +1,6 @@
 import { useStore } from "./utils";
 
-export function useStorage({ mapProps }) {
+export function useStorage({ height }) {
   const {
     styles: {
       animatedOpacity,
@@ -24,12 +24,13 @@ export function useStorage({ mapProps }) {
     },
     fields,
     buttons,
-    View,
     Text,
+    View,
+    About,
     Animated,
     SafeAreaView,
     TouchableOpacity,
-  } = useStore({ mapProps });
+  } = useStore({ height });
 
   return (
     <SafeAreaView>
@@ -38,12 +39,17 @@ export function useStorage({ mapProps }) {
         style={animatedOpacity}
         contentContainerStyle={scrollStyles}
       >
-        {fields.map(({ label, detail }) => (
-          <View key={label} style={fieldStyles}>
+        {fields.map(({ id, detail }) => (
+          <View key={id} style={fieldStyles}>
             <View style={labelStyles}>
-              <Text style={titleStyles}>{label}</Text>
+              <Text style={titleStyles}>{id}</Text>
             </View>
-            <Text style={detailStyles}>{detail}</Text>
+
+            {id !== "About" ? (
+              <Text style={detailStyles}>{detail}</Text>
+            ) : (
+              <About detail={detail} styles={detailStyles} />
+            )}
           </View>
         ))}
 

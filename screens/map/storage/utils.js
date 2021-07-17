@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo } from "react";
+import { memo, useLayoutEffect, useMemo, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -8,7 +8,8 @@ import {
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import colors from "tools/styles/colors";
-import buttonStyles from "tools/styles/button";
+import config from "tools/styles/config";
+import defaultButtonStyles from "tools/styles/button";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -17,13 +18,13 @@ import Animated, {
 
 let initOpacity;
 
-export function useStore({ mapProps }) {
+export function useStore({ height }) {
   const { params: { name, about, street, postcode, city, phone, email } = {} } =
     useRoute();
   const { setOptions } = useNavigation();
   const { create, compose } = useMemo(() => StyleSheet, []);
   const {
-    text: { primary: primaryText },
+    text: { primary: primaryText, secondary: secondaryText },
     background: {
       accent: accentBackground,
       primary: primaryBackground,
@@ -32,15 +33,8 @@ export function useStore({ mapProps }) {
   } = useMemo(() => colors, []);
   const opacity = useSharedValue(1);
   const animatedOpacity = useAnimatedStyle(() => ({
-    opacity: withSpring(opacity.value, {
-      damping: 30,
-      stiffness: 250,
-      overshootClamping: true,
-      restSpeedThreshold: 0.1,
-      restDisplacementThreshold: 0.1,
-    }),
+    opacity: withSpring(opacity.value, config),
   }));
-  const { height } = useMemo(() => mapProps(), [mapProps]);
 
   useLayoutEffect(() => {
     initOpacity = opacity;
@@ -56,7 +50,7 @@ export function useStore({ mapProps }) {
 
   return {
     styles: useMemo(() => {
-      const buttonStyle = buttonStyles(true);
+      const buttonStyle = defaultButtonStyles(true);
 
       return {
         ...create({
@@ -106,7 +100,7 @@ export function useStore({ mapProps }) {
               backgroundColor: primaryBackground(),
             },
             titleStyles: {
-              fontSize: 12,
+              fontSize: 11,
               textAlign: "center",
               color: accentBackground(),
               fontWeight: "800",
@@ -137,22 +131,60 @@ export function useStore({ mapProps }) {
     fields: useMemo(
       () => [
         {
-          label: "About",
+          id: "About",
           detail: about,
         },
         {
-          label: "Contact",
+          id: "Contact",
           detail: `${street} \n${postcode}, ${city} \nUnited Kingdom \n${phone} \n${email}`,
         },
         {
-          label: "Time",
+          id: "Time",
           detail: "09:00 — 21:00 • Mon — Fri",
         },
       ],
       [about, city, email, phone, postcode, street]
     ),
-    View,
+    About: useMemo(() => {
+      function useAbout({ detail, styles }) {
+        const [isShown, show] = useState(false);
+        const { innerTextStyles } = useMemo(
+          () =>
+            create({
+              innerTextStyles: {
+                color: secondaryText(),
+                paddingLeft: 20,
+                paddingTop: 5,
+              },
+            }),
+          []
+        );
+        const threshold = useMemo(() => detail?.length / 3, [detail?.length]);
+
+        return (
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={show.bind(null, (old) => !old)}
+          >
+            <Text style={styles}>
+              {isShown || threshold < 143
+                ? detail
+                : `${detail?.substring(0, threshold)}...`}
+            </Text>
+
+            {threshold >= 143 && (
+              <Text style={innerTextStyles}>
+                Read {isShown ? "Less" : "More"}
+              </Text>
+            )}
+          </TouchableOpacity>
+        );
+      }
+
+      return memo(useAbout);
+    }, [secondaryText, create]),
     Text,
+    View,
     Animated,
     SafeAreaView,
     TouchableOpacity,

@@ -8,7 +8,6 @@ import {
 import { getDimensions } from "tools/dimensions";
 import colors from "tools/styles/colors";
 import iconStyles from "tools/styles/icon";
-import { string, bool } from "prop-types";
 import { useHome } from "./home/index.routes";
 import { useUser } from "./user/index.routes";
 import { useMap } from "./map";
@@ -27,32 +26,23 @@ export function useStore() {
         screenOptions({ route: { name } }) {
           function useTabBarIcon({ focused }) {
             const Icon = useMemo(() => {
-              const useIcon = memo(({ name: label, isFocused }) => {
-                useMemo(() => {
-                  useIcon.displayName = "Icon";
-                  useIcon.propTypes = {
-                    name: string.isRequired,
-                    isFocused: bool.isRequired,
-                  };
-                }, []);
-
-                const size = useMemo(() => 20, []);
-                const { containerStyles: style } = useMemo(
-                  () => iconStyles({}),
-                  []
-                );
-                const { containerStyles: mapStyles } = useMemo(
-                  () =>
-                    iconStyles({
+              function useIcon({ name: label, isFocused }) {
+                const { style, mapStyles, fill, size } = useMemo(
+                  () => ({
+                    style: iconStyles({}),
+                    mapStyles: iconStyles({
                       shadowRadius: 5,
                       shadowOffset: {
                         height: 0,
                         width: 0,
                       },
                     }),
+                    fill: accentText(),
+                    size: 20,
+                  }),
                   []
                 );
-                const fill = useMemo(() => accentText(), []);
+
                 let icon;
 
                 if (label === "User") {
@@ -78,9 +68,9 @@ export function useStore() {
                 }
 
                 return icon;
-              });
+              }
 
-              return useIcon;
+              return memo(useIcon);
             }, []);
 
             return <Icon name={name} isFocused={focused} />;

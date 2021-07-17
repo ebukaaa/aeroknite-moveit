@@ -22,6 +22,7 @@ import { PanGestureHandler } from "react-native-gesture-handler";
 import { getDimensions } from "tools/dimensions";
 import { auth, db } from "tools/firebase";
 import colors from "tools/styles/colors";
+import config from "tools/styles/config";
 import buttonStyles from "tools/styles/button";
 
 let putState;
@@ -38,19 +39,9 @@ export function useStore() {
   const { goBack, navigate, replace } = useNavigation();
   const { height: deviceHeight } = useWindowDimensions();
   const { height: desiredHeight } = useMemo(() => getDimensions(null, 70), []);
-  const springConfig = useMemo(
-    () => ({
-      damping: 80,
-      overshootClamping: true,
-      restDisplacementThreshold: 0.1,
-      restSpeedThreshold: 0.1,
-      stiffness: 500,
-    }),
-    []
-  );
   const top = useSharedValue(deviceHeight);
   const animatedStyle = useAnimatedStyle(() => ({
-    top: withSpring(top.value, springConfig),
+    top: withSpring(top.value, config),
   }));
   const onGoBack = useCallback(
     (props) => {
@@ -77,7 +68,7 @@ export function useStore() {
   );
 
   useLayoutEffect(() => {
-    top.value = withSpring(desiredHeight, springConfig);
+    top.value = withSpring(desiredHeight, config);
     putState((old) => ({
       ...old,
       height: desiredHeight,
@@ -96,7 +87,7 @@ export function useStore() {
     );
 
     return () => Keyboard.removeSubscription(keyboardWillShow);
-  }, [top, desiredHeight, springConfig]);
+  }, [top, desiredHeight]);
 
   return {
     styles: useMemo(() => {
